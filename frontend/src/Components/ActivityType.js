@@ -9,47 +9,67 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useEffect } from "react";
 
 const ActivityType = (props) => {
   const navigate = useNavigate();
 
-  const [editActivity, setEditActivity] = useState([]);
-  const [userActivityType, setUserActivityType] = useState("");
+  console.log("PROPS: ", props);
+
+  useEffect(() => {
+    if (props.editActivityData === 0) {
+      props.setUserActivityType({
+        activity: "",
+        duration: "",
+        date: "",
+      });
+    } else {
+      props.setUserActivityType(props.editActivityData);
+      console.log("User Activity Type:", props.userActivityType);
+    }
+  }, []);
+
   const handleUserActivityType = (e) => {
-    setUserActivityType({
-      ...userActivityType,
+    props.setUserActivityType({
+      ...props.userActivityType,
       [e.target.name]: e.target.value,
     });
   };
-  console.log("Activity Type", userActivityType);
+  console.log("Activity Type", props.userActivityType);
+  console.log("Edit Activity Data:", props.editId);
 
   const editUserActivity = () => {
     const activityLog = {
-      activity: userActivityType.activity,
-      duration: userActivityType.duration,
-      date: userActivityType.date,
+      activity: props.userActivityType.activity,
+      duration: props.userActivityType.duration,
+      date: props.userActivityType.date,
     };
+    console.log("showwww", props.showForm);
+    console.log("Activity Log:", activityLog);
 
-    if (props.setShowForm(true)) {
+    if (props.showForm) {
       axios
         .put(`http://localhost:3500/activity/${props.editId}`, {
-          activity: userActivityType.activity,
-          duration: userActivityType.duration,
-          date: userActivityType.date,
+          activity: props.userActivityType.activity,
+          duration: props.userActivityType.duration,
+          date: props.userActivityType.date,
         })
         .then((res) => {
-          console.log("");
+          props.activityInput.push(activityLog);
+          props.setActivityInput(props.activityInput);
+
+          console.log("Edit Data:", res);
         })
 
         .catch((err) => alert("CardPost", err));
-
-      props.getActivity();
+      props.setShowForm(false);
+      //props.getActivity();
     } else {
       axios
         .post("http://localhost:3500/activity", {
-          activity: userActivityType.activity,
-          duration: userActivityType.duration,
-          date: userActivityType.date,
+          activity: props.userActivityType.activity,
+          duration: props.userActivityType.duration,
+          date: props.userActivityType.date,
         })
 
         .then((response) => {
@@ -62,7 +82,7 @@ const ActivityType = (props) => {
         });
     }
   };
-
+  //console.log("Activity Input", activityInput);
   return (
     <div>
       <div id="activity">
@@ -75,7 +95,11 @@ const ActivityType = (props) => {
               <form>
                 <FormControl fullWidth>
                   <InputLabel>Activity Type</InputLabel>
-                  <Select name="activity" onChange={handleUserActivityType}>
+                  <Select
+                    name="activity"
+                    onChange={handleUserActivityType}
+                    value={props.userActivityType.activity}
+                  >
                     <MenuItem value="Run">Run</MenuItem>
                     <MenuItem value="Walk">Walk</MenuItem>
                     <MenuItem value="Hike">Hike</MenuItem>
@@ -91,7 +115,7 @@ const ActivityType = (props) => {
                     variant="outlined"
                     type="number"
                     name="duration"
-                    value={userActivityType.duration}
+                    value={props.userActivityType.duration}
                     onChange={handleUserActivityType}
                   ></TextField>
                 </Box>
@@ -100,7 +124,7 @@ const ActivityType = (props) => {
                     fullWidth
                     type="date"
                     name="date"
-                    value={userActivityType.date}
+                    value={props.userActivityType.date}
                     id="outlined-basic"
                     variant="outlined"
                     onChange={handleUserActivityType}
@@ -110,7 +134,6 @@ const ActivityType = (props) => {
                   <Button
                     variant="contained"
                     color="success"
-                    // type="submit"
                     onClick={() => {
                       editUserActivity();
                       navigate("/dashboard", { replace: true });

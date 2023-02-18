@@ -108,7 +108,8 @@ app.post("/activity", async (req, res) => {
     })
     .catch((err) => {
       // res.status(500).send(err.message);
-      console.log("api failed");
+
+      console.log("api failed", err);
     });
 });
 
@@ -155,10 +156,28 @@ app.delete("/activity/:id", async (req, res) => {
 });
 //Edit activity
 
+// app.put("/activity/:id", async (req, res) => {
+//   const id = req.params.id;
+//   const post = await activity.findByIdAndUpdate(
+//     id,
+//     {
+//       $set: req.body,
+//     },
+//     { new: true },
+//     (err, updatedObj) => {
+//       if (err) {
+//         res.status(422).json({ status: false, error: "Item not updated" });
+//       } else {
+//         res.status(200).json({ updatedObj });
+//       }
+//     }
+//   );
+//   res.send(post);
+// });
+
 app.put("/activity/:id", async (req, res) => {
-  const id = req.params.id;
-  const post = await activity.findByIdAndUpdate(id, {
-    $set: req.body,
+  let user = await activity.findByIdAndUpdate(req.params.id, req.body, {
+    runValidators: true,
   });
-  res.send(post);
+  res.json({ message: "user updated", user: user });
 });

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import Form from "./Form";
 import About from "./About";
 import ActivityType from "./ActivityType";
-import { Routes, Route } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Dashboard from "./Dashboard";
@@ -12,8 +12,26 @@ import axios from "axios";
 const Main = () => {
   const [userInput, setUserInput] = useState([]);
   const [activityInput, setActivityInput] = useState([]);
+  const [userProfile, setUserProfile] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(0);
   const [editActivityData, setEditActivityData] = useState(0);
+  const [userActivityType, setUserActivityType] = useState({
+    activity: "",
+    duration: "",
+    date: "",
+  });
+
+  const [userData, setUserData] = useState({
+    fullName: "",
+    description: "",
+    age: "",
+    sex: "",
+  });
+  const handleInput = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
+  console.log(userData);
 
   const [bmi, setBmi] = useState();
 
@@ -45,14 +63,6 @@ const Main = () => {
   console.log("userInput", userInput);
   console.log("BMI:", bmi);
 
-  const [userData, setUserData] = useState("");
-  const handleInput = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
-  };
-  console.log(userData);
-
-  const [userProfile, setUserProfile] = useState([]);
-
   const getProfile = () => {
     axios
       .get("http://localhost:3500/profile/")
@@ -68,32 +78,31 @@ const Main = () => {
       .get("http://localhost:3500/activity/")
       .then((response) => {
         setActivityInput(response.data);
-        console.log("ProfileSSS:", userProfile);
+        console.log("Profile", userProfile);
       })
       .catch((err) => alert("Fail to fetch Profile", err));
   };
 
-  const editActivity = (id) => {
-    fetch(`http://localhost:3500/activity/${id}`)
-      .then((data1) => data1.json())
-      .then((res) => setActivityInput(res));
+  const editActivity = async (id, user) => {
+    await fetch(`http://localhost:3500/activity/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Fetch PUT Request Example" }),
+    }).then((res) => setActivityInput(res.data));
 
-    setEditActivityData(id);
-    console.log(showForm);
+    console.log("User ID:", id);
+    console.log("User Info:", user);
   };
 
   useEffect(() => {
     getProfile();
     getActivity();
   }, []);
-  console.log("ProfileEEE:", userProfile);
 
   return (
     <div>
       <Navbar />
       <Routes>
-        {/* <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} /> */}
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route
@@ -103,9 +112,15 @@ const Main = () => {
               activityInput={activityInput}
               setActivityInput={setActivityInput}
               userData={userData}
+              setShowForm={setShowForm}
+              showForm={showForm}
               getProfile={getProfile}
               userProfile={userProfile}
               editActivity={editActivity}
+              setEditActivityData={setEditActivityData}
+              setEditId={setEditId}
+              userActivityType={userActivityType}
+              setUserActivityType={setUserActivityType}
             />
           }
         />
@@ -133,10 +148,13 @@ const Main = () => {
               activityInput={activityInput}
               setActivityInput={setActivityInput}
               setShowForm={setShowForm}
+              showForm={showForm}
               setEditActivityData={setEditActivityData}
               editActivityData={editActivityData}
               editId={editActivityData._id}
               editActivity={editActivity}
+              userActivityType={userActivityType}
+              setUserActivityType={setUserActivityType}
             />
           }
         />

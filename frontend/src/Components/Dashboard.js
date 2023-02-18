@@ -17,12 +17,11 @@ const Dashboard = (props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   return (
     <div>
       <div className="profileDash">
         <Box>
-          <Card sx={{ maxWidth: 345 }}>
+          <Card sx={{ maxWidth: 400 }}>
             <CardMedia
               component="img"
               alt="green iguana"
@@ -54,9 +53,15 @@ const Dashboard = (props) => {
                 <Cards
                   user={user}
                   userId={user._id}
+                  userActivityType={props.userActivityType}
+                  setUserActivityType={props.setUserActivityType}
                   activityInput={props.activityInput}
                   setActivityInput={props.setActivityInput}
                   editActivity={props.editActivity}
+                  setEditActivityData={props.setEditActivityData}
+                  setShowForm={props.setShowForm}
+                  showForm={props.showForm}
+                  setEditId={props.setEditId}
                 />
               </div>
             ))}

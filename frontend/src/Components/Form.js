@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Form = (props) => {
   const navigate = useNavigate();
+  
   const postUserProfile = () => {
     const profile = {
       fullName: props.userData.fullName,
